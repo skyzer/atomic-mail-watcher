@@ -1,12 +1,12 @@
 [project]
-name = "atomicmail-watcher"
+name = "atomic-mail-watcher"
 version = "0.1.0"
 description = "Docker-ready Atomic Mail JMAP inbox watcher with Telegram/webhook/stdout notifications"
 readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Atomic Mail Watcher contributors" }]
-keywords = ["atomicmail", "jmap", "email", "agents", "agent-inbox", "openclaw", "telegram", "webhook", "docker"]
+keywords = ["atomic-mail", "atomicmail", "jmap", "email", "agents", "agent-inbox", "openclaw", "telegram", "webhook", "docker"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",
@@ -17,7 +17,7 @@ classifiers = [
 ]
 
 [project.scripts]
-atomicmail-watcher = "atomicmail_watcher:main"
+atomic-mail-watcher = "atomicmail_watcher:main"
 
 [tool.ruff]
 line-length = 120

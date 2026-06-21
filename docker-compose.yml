@@ -1,8 +1,8 @@
 services:
-  atomicmail-watcher:
+  atomic-mail-watcher:
     build: .
-    image: atomicmail-watcher:local
-    container_name: atomicmail-watcher
+    image: atomic-mail-watcher:local
+    container_name: atomic-mail-watcher
     restart: unless-stopped
     env_file:
       - path: .env

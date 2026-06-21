@@ -67,7 +67,7 @@ Recommended architecture:
 Atomic-Mail/atomic-mail-agentic
   = official tools agents use to register, read, send, reply, and manage mail
 
-skyzer/atomicmail-watcher
+skyzer/atomic-mail-watcher
   = Docker notification sidecar that wakes humans or agents when new mail appears
 ```
 
@@ -108,7 +108,7 @@ docker compose up -d --build
 Follow logs:
 
 ```bash
-docker compose logs -f atomicmail-watcher
+docker compose logs -f atomic-mail-watcher
 ```
 
 The first run initializes `data/state.json` with currently visible inbox messages and does **not** alert old mail. New messages after that trigger notifications.
@@ -118,13 +118,13 @@ The first run initializes `data/state.json` with currently visible inbox message
 Useful for cron, Kubernetes CronJob, systemd timers, or any platform that expects stdout only when something happened:
 
 ```bash
-docker compose run --rm atomicmail-watcher --mode check --emit-stdout
+docker compose run --rm atomic-mail-watcher --mode check --emit-stdout
 ```
 
 Initialize state without notifying:
 
 ```bash
-docker compose run --rm atomicmail-watcher --mode check --initialize-only --verbose
+docker compose run --rm atomic-mail-watcher --mode check --initialize-only --verbose
 ```
 
 ## Test notification path
@@ -132,7 +132,7 @@ docker compose run --rm atomicmail-watcher --mode check --initialize-only --verb
 This only tests your notifier credentials; it does not require Atomic Mail credentials:
 
 ```bash
-docker compose run --rm atomicmail-watcher --mode test-notifier --send-telegram
+docker compose run --rm atomic-mail-watcher --mode test-notifier --send-telegram
 ```
 
 ## Configuration
@@ -198,8 +198,8 @@ python -m atomicmail_watcher --mode check --emit-stdout
 ## Docker image
 
 ```bash
-docker build -t atomicmail-watcher:local .
-docker run --rm --env-file .env -v "$PWD/data:/data" atomicmail-watcher:local --mode check --verbose
+docker build -t atomic-mail-watcher:local .
+docker run --rm --env-file .env -v "$PWD/data:/data" atomic-mail-watcher:local --mode check --verbose
 ```
 
 ## Atomic Mail roadmap / future implementation ideas

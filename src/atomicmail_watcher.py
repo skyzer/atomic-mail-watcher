@@ -30,7 +30,7 @@ MAIL = "urn:ietf:params:jmap:mail"
 DEFAULT_AUTH_URL = "https://auth.atomicmail.ai"
 DEFAULT_API_URL = "https://api.atomicmail.ai"
 DEFAULT_POW_SCRYPT_SALT_HEX = "0b980734412c292d6549110276b604ab1dea4883bd460d77d1b984adf8bca083"
-USER_AGENT = "atomicmail-watcher/0.1"
+USER_AGENT = "atomic-mail-watcher/0.1"
 
 
 class AtomicMailError(RuntimeError):
@@ -767,7 +767,7 @@ def main(argv: list[str] | None = None) -> int:
         if args.mode == "test-notifier":
             return run_test_notifier(args)
     except Exception as exc:  # noqa: BLE001
-        print(f"atomicmail-watcher error: {type(exc).__name__}: {exc}", file=sys.stderr)
+        print(f"atomic-mail-watcher error: {type(exc).__name__}: {exc}", file=sys.stderr)
         if args.verbose:
             traceback.print_exc()
         return 1

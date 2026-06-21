@@ -4,6 +4,12 @@ Docker-ready Atomic Mail inbox watcher for AI agents.
 
 It uses Atomic Mail's JMAP API to detect new inbox mail, deduplicates messages locally, and can notify Telegram, a generic webhook, or stdout. It is designed for agent inboxes where you want proactive "mail arrived" alerts without giving the watcher permission to auto-reply.
 
+## Example Telegram notification
+
+![Sanitized Telegram screenshot showing Atomic Mail Watcher notifying an agent about new mail](docs/assets/telegram-new-mail-notification.png)
+
+_Sanitized example: real inbox addresses, sender addresses, chat IDs, and job IDs are replaced with placeholders._
+
 ## What this is
 
 - Near-real-time watcher using JMAP `eventSourceUrl` when available.

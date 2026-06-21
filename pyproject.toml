@@ -6,7 +6,7 @@ readme = "README.md"
 requires-python = ">=3.11"
 license = { text = "MIT" }
 authors = [{ name = "Atomic Mail Watcher contributors" }]
-keywords = ["atomicmail", "jmap", "email", "agents", "telegram", "docker"]
+keywords = ["atomicmail", "jmap", "email", "agents", "agent-inbox", "openclaw", "telegram", "webhook", "docker"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Environment :: Console",

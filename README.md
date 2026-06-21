@@ -19,6 +19,27 @@ It uses Atomic Mail's JMAP API to detect new inbox mail, deduplicates messages l
 - It does not send email replies. It only notifies that mail arrived.
 - It is not Hermes-specific. Hermes can run it, but any Docker host can run it.
 
+## Agent compatibility
+
+This project is agent-agnostic. It is not a native plugin for every agent listed below; it is a small notification bridge that any agent/runtime can use if it can run Docker, read stdout, receive a webhook, or watch a chat notification channel.
+
+Representative pairings:
+
+| Agent / runtime | How it fits |
+|---|---|
+| **Hermes Agent** | Run as a local daemon, cron fallback, or webhook notifier for a Hermes-owned inbox. |
+| **OpenClaw** | Run the Docker Compose service next to OpenClaw and route new-mail alerts through stdout, Telegram, or a webhook. |
+| **Claude Code** | Use one-shot `check --emit-stdout` in shell workflows, or consume webhook notifications. |
+| **OpenAI Codex CLI** | Use the Docker image as a sidecar inbox monitor for coding-agent workflows. |
+| **OpenCode** | Run the watcher as a companion service and let OpenCode react to webhook/stdout alerts. |
+| **Cursor / Windsurf / VS Code agents** | Use Docker Compose locally and inspect stdout/webhook notifications from the agent workflow. |
+| **LangChain / LangGraph agents** | Consume the generic webhook payload or invoke one-shot check mode from a tool. |
+| **CrewAI / AutoGen-style agents** | Treat the watcher as an external mailbox event source. |
+| **Dify / n8n / Pipedream / Zapier / Make** | Use webhook delivery to trigger workflows when new mail arrives. |
+| **Kubernetes / systemd / Nomad / any Docker host** | Run as a long-lived service or periodic one-shot job. |
+
+In short: if an agent can call a command, run a container, or receive an HTTP webhook, it can use this watcher.
+
 ## Quick start with Docker Compose
 
 ```bash

@@ -40,6 +40,39 @@ Representative pairings:
 
 In short: if an agent can call a command, run a container, or receive an HTTP webhook, it can use this watcher.
 
+## Relationship to Atomic Mail Agentic
+
+This project complements the official [Atomic Mail Agentic](https://github.com/Atomic-Mail/atomic-mail-agentic) repository. It is not a replacement for the official integration stack.
+
+Use **Atomic Mail Agentic** for registration, MCP, AgentSkill, sending/replying, attachments, JMAP presets, LangChain, Dify, n8n, and other first-party integrations. Use **Atomic Mail Watcher** when you want a small Dockerized sidecar that watches an existing inbox and sends proactive notifications.
+
+| Question | Atomic Mail Agentic | Atomic Mail Watcher |
+|---|---|---|
+| Is it official Atomic Mail code? | Yes — first-party Atomic Mail integration monorepo | No — small community sidecar utility |
+| Primary purpose | Give agents a full programmable mailbox capability | Notify when new mail arrives in an existing inbox |
+| Creates/registers inboxes? | Yes — PoW signup and credential persistence | Not yet — bring an existing inbox/API key |
+| Reads inbox? | Yes — via `jmap_request`, presets, MCP/tools | Yes — focused on new-message detection and dedupe |
+| Sends/replies to email? | Yes — send, reply, attachments, raw JMAP | No — deliberately notification-only |
+| MCP support | Yes | Not directly |
+| AgentSkill / OpenClaw / Hermes skill support | Yes | Not as a native skill; usable beside those agents |
+| LangChain / Dify / n8n integrations | Yes | Generic webhook/stdout only |
+| Proactive notification daemon | Partial — n8n polling trigger and scheduled-agent guidance | Yes — Docker daemon with JMAP EventSource/SSE plus reconcile loop |
+| Telegram notifications | Not a main feature | Yes |
+| Docker-first deployment | Not the main shape | Yes |
+| Best use | Agent owns and operates an inbox end-to-end | Host/operator gets proactive “new mail arrived” alerts |
+
+Recommended architecture:
+
+```text
+Atomic-Mail/atomic-mail-agentic
+  = official tools agents use to register, read, send, reply, and manage mail
+
+skyzer/atomicmail-watcher
+  = Docker notification sidecar that wakes humans or agents when new mail appears
+```
+
+A practical workflow is: register and operate the inbox with the official Atomic Mail tools, run this watcher next to your agent runtime, then let the user or agent decide whether to inspect, reply, forward, or ignore each notification.
+
 ## Quick start with Docker Compose
 
 ```bash

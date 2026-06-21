@@ -1,0 +1,17 @@
+services:
+  atomicmail-watcher:
+    build: .
+    image: atomicmail-watcher:local
+    container_name: atomicmail-watcher
+    restart: unless-stopped
+    env_file:
+      - path: .env
+        required: false
+    volumes:
+      - ./data:/data
+    command:
+      - --mode
+      - watch
+      - --send-telegram
+      - --reconcile-seconds
+      - "1800"

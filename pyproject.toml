@@ -1,0 +1,23 @@
+[project]
+name = "atomicmail-watcher"
+version = "0.1.0"
+description = "Docker-ready Atomic Mail JMAP inbox watcher with Telegram/webhook/stdout notifications"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Atomic Mail Watcher contributors" }]
+keywords = ["atomicmail", "jmap", "email", "agents", "telegram", "docker"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Console",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+[project.scripts]
+atomicmail-watcher = "atomicmail_watcher:main"
+
+[tool.ruff]
+line-length = 120

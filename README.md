@@ -148,6 +148,22 @@ docker build -t atomicmail-watcher:local .
 docker run --rm --env-file .env -v "$PWD/data:/data" atomicmail-watcher:local --mode check --verbose
 ```
 
+## Atomic Mail roadmap / future implementation ideas
+
+This watcher is intentionally small: it only alerts when mail arrives. Atomic Mail's public agent docs describe a broader agent-email stack, and the following pieces are good candidates for later implementation here:
+
+- **Built-in account registration**: wrap Atomic Mail's PoW signup flow so a container can create/recover an `@atomicmail.ai` inbox from a username instead of requiring a pre-created API key.
+- **Human-approved send/reply mode**: add optional JMAP `Email/set` + `EmailSubmission/set` helpers for drafting or sending replies, but keep this disabled by default and gated by explicit human approval.
+- **Official integration adapters**: expose the watcher as a tool around Atomic Mail's MCP, AgentSkill, LangChain, Dify, and n8n integration patterns instead of only running as a standalone daemon.
+- **Custom domains**: Atomic Mail currently advertises custom domains as coming soon. When available, support domain-specific inbox config and document DNS/setup requirements.
+- **Stable-release hardening**: Atomic Mail Agentic is currently described as open alpha/free with quotas and rate limits. When the public stable release lands, revisit defaults for backoff, quotas, errors, and auth/token lifetimes.
+- **Richer triage**: optionally classify new messages, thread related updates, and send summaries to webhooks without exposing full message bodies unless configured.
+
+References:
+
+- Atomic Mail Agents: <https://atomicmail.io/agents>
+- Atomic Mail Agentic docs: <https://atomic-mail.github.io/atomic-mail-agentic/>
+
 ## Security notes
 
 - Do not commit `.env`, `data/`, `*.jwt`, or credential JSON files.
@@ -158,4 +174,4 @@ docker run --rm --env-file .env -v "$PWD/data:/data" atomicmail-watcher:local --
 
 ## Open-source status
 
-This package is suitable to publish as a small MIT-licensed utility. Before publishing, do a final check that your working tree does not contain private `.env`, `data/`, logs, tokens, or user-specific paths.
+MIT-licensed and intended for public use. Before publishing or cutting releases, verify that the working tree does not contain private `.env`, `data/`, logs, tokens, or user-specific paths.

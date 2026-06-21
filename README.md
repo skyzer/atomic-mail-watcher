@@ -6,9 +6,9 @@ It uses Atomic Mail's JMAP API to detect new inbox mail, deduplicates messages l
 
 ## Example Telegram notification
 
-![Sanitized Telegram screenshot showing Atomic Mail Watcher notifying an agent about new mail](docs/assets/telegram-new-mail-notification.png)
+When new mail arrives, Atomic Mail Watcher can post a clear Telegram alert to your agent or operator chat:
 
-_Sanitized example: real inbox addresses, sender addresses, chat IDs, and job IDs are replaced with placeholders._
+![Telegram notification showing Atomic Mail Watcher alerting that new mail arrived](docs/assets/telegram-new-mail-notification.png)
 
 ## What this is
 

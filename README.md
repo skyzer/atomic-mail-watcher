@@ -18,6 +18,7 @@ When new mail arrives, Atomic Mail Watcher can post a clear Telegram alert to yo
 - Secret-safe by default: credentials stay in mounted files or env vars; state is local.
 - Pure Python stdlib; no runtime package dependencies.
 - Docker and Docker Compose included.
+- Multiple inboxes by running one isolated watcher container per inbox.
 
 ## What this is not
 
@@ -118,6 +119,77 @@ docker compose logs -f atomic-mail-watcher
 ```
 
 The first run initializes `data/state.json` with currently visible inbox messages and does **not** alert old mail. New messages after that trigger notifications.
+
+## Watching multiple inboxes
+
+The recommended multi-inbox setup is **one watcher container per inbox**. Each container uses the same image, but gets its own mounted data directory for credentials, state, logs, and JWT cache. That keeps agents isolated: one inbox failing authentication or reconnecting does not affect the others.
+
+Each inbox needs its own Atomic Mail API credentials. A login password or seed phrase alone is not enough for the watcher; create or export an API key for every inbox you want to monitor.
+
+This repo includes `docker-compose.multi.yml` with two example services:
+
+| Service | Data directory | Env file | Intended use |
+|---|---|---|---|
+| `atomic-mail-agent-a` | `./data/agent-a` | `.env.agent-a` | first agent inbox |
+| `atomic-mail-agent-b` | `./data/agent-b` | `.env.agent-b` | second agent inbox |
+
+Create one credentials file per inbox:
+
+```bash
+mkdir -p data/agent-a data/agent-b
+chmod 700 data/agent-a data/agent-b
+```
+
+`data/agent-a/credentials.json`:
+
+```json
+{
+  "inboxId": "agent-a@atomicmail.ai",
+  "apiKey": "am_...",
+  "authUrl": "https://auth.atomicmail.ai",
+  "apiUrl": "https://api.atomicmail.ai"
+}
+```
+
+`data/agent-b/credentials.json`:
+
+```json
+{
+  "inboxId": "agent-b@atomicmail.ai",
+  "apiKey": "am_...",
+  "authUrl": "https://auth.atomicmail.ai",
+  "apiUrl": "https://api.atomicmail.ai"
+}
+```
+
+Create one notification env file per watcher. They can point to the same Telegram chat or to different chats/topics:
+
+```bash
+# .env.agent-a
+TELEGRAM_BOT_TOKEN=123456:abc
+TELEGRAM_CHAT_ID=123456789
+```
+
+```bash
+# .env.agent-b
+TELEGRAM_BOT_TOKEN=123456:abc
+TELEGRAM_CHAT_ID=123456789
+```
+
+Start both watchers:
+
+```bash
+docker compose -f docker-compose.multi.yml up -d --build
+```
+
+Start or inspect one watcher only:
+
+```bash
+docker compose -f docker-compose.multi.yml up -d atomic-mail-agent-b
+docker compose -f docker-compose.multi.yml logs -f atomic-mail-agent-b
+```
+
+The alert text includes the inbox address, so shared Telegram channels can still tell which agent received the email.
 
 ## One-shot check mode
 

@@ -1,0 +1,29 @@
+x-atomic-mail-watcher-base: &atomic-mail-watcher-base
+  build: .
+  image: atomic-mail-watcher:local
+  restart: unless-stopped
+  command:
+    - --mode
+    - watch
+    - --send-telegram
+    - --reconcile-seconds
+    - "1800"
+
+services:
+  atomic-mail-agent-a:
+    <<: *atomic-mail-watcher-base
+    container_name: atomic-mail-agent-a
+    env_file:
+      - path: .env.agent-a
+        required: false
+    volumes:
+      - ./data/agent-a:/data
+
+  atomic-mail-agent-b:
+    <<: *atomic-mail-watcher-base
+    container_name: atomic-mail-agent-b
+    env_file:
+      - path: .env.agent-b
+        required: false
+    volumes:
+      - ./data/agent-b:/data

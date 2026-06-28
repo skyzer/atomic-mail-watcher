@@ -82,63 +82,21 @@ A practical workflow is: register and operate the inbox with the official Atomic
 
 ## Quick start with Docker Compose
 
-```bash
-cp .env.example .env
-mkdir -p data
-chmod 700 data
-```
+The default `docker-compose.yml` is multi-inbox-first: run one isolated watcher service per Atomic Mail inbox. Add, remove, or rename services in `docker-compose.yml` to match your agents.
 
-Create `data/credentials.json`:
-
-```json
-{
-  "inboxId": "your-agent@atomicmail.ai",
-  "apiKey": "am_...",
-  "authUrl": "https://auth.atomicmail.ai",
-  "apiUrl": "https://api.atomicmail.ai"
-}
-```
-
-Edit `.env` with notification settings, for example Telegram:
-
-```bash
-TELEGRAM_BOT_TOKEN=123456:abc
-TELEGRAM_CHAT_ID=123456789
-```
-
-Build and run:
-
-```bash
-docker compose up -d --build
-```
-
-Follow logs:
-
-```bash
-docker compose logs -f atomic-mail-watcher
-```
-
-The first run initializes `data/state.json` with currently visible inbox messages and does **not** alert old mail. New messages after that trigger notifications.
-
-## Watching multiple inboxes
-
-The recommended multi-inbox setup is **one watcher container per inbox**. Each container uses the same image, but gets its own mounted data directory for credentials, state, logs, and JWT cache. That keeps agents isolated: one inbox failing authentication or reconnecting does not affect the others.
-
-Each inbox needs its own Atomic Mail API credentials. A login password or seed phrase alone is not enough for the watcher; create or export an API key for every inbox you want to monitor.
-
-This repo includes `docker-compose.multi.yml` with two example services:
-
-| Service | Data directory | Env file | Intended use |
+| Service | Credentials | Notifications | State, logs, JWT cache |
 |---|---|---|---|
-| `atomic-mail-agent-a` | `./data/agent-a` | `.env.agent-a` | first agent inbox |
-| `atomic-mail-agent-b` | `./data/agent-b` | `.env.agent-b` | second agent inbox |
+| `atomic-mail-agent-a` | `data/agent-a/credentials.json` | `.env.agent-a` | `data/agent-a/` |
+| `atomic-mail-agent-b` | `data/agent-b/credentials.json` | `.env.agent-b` | `data/agent-b/` |
 
-Create one credentials file per inbox:
+Create one data directory per inbox:
 
 ```bash
 mkdir -p data/agent-a data/agent-b
 chmod 700 data/agent-a data/agent-b
 ```
+
+Create one credentials file per inbox. Each inbox needs its own Atomic Mail API key; a login password or seed phrase alone is not enough for the watcher.
 
 `data/agent-a/credentials.json`:
 
@@ -162,47 +120,55 @@ chmod 700 data/agent-a data/agent-b
 }
 ```
 
-Create one notification env file per watcher. They can point to the same Telegram chat or to different chats/topics:
+Create one notification env file per watcher. They can point to the same Telegram chat, different chats, or different webhook endpoints:
 
 ```bash
-# .env.agent-a
+cp .env.example .env.agent-a
+cp .env.example .env.agent-b
+```
+
+Edit each `.env.agent-*` file with notifier settings, for example:
+
+```bash
 TELEGRAM_BOT_TOKEN=123456:abc
 TELEGRAM_CHAT_ID=123456789
 ```
 
-```bash
-# .env.agent-b
-TELEGRAM_BOT_TOKEN=123456:abc
-TELEGRAM_CHAT_ID=123456789
-```
-
-Start both watchers:
+Build and start all configured inbox watchers:
 
 ```bash
-docker compose -f docker-compose.multi.yml up -d --build
+docker compose up -d --build
 ```
 
-Start or inspect one watcher only:
+Start only one inbox watcher:
 
 ```bash
-docker compose -f docker-compose.multi.yml up -d atomic-mail-agent-b
-docker compose -f docker-compose.multi.yml logs -f atomic-mail-agent-b
+docker compose up -d --build atomic-mail-agent-a
 ```
 
-The alert text includes the inbox address, so shared Telegram channels can still tell which agent received the email.
+Follow logs:
+
+```bash
+docker compose logs -f atomic-mail-agent-a
+docker compose logs -f atomic-mail-agent-b
+```
+
+On first run, each service initializes its own `/data/state.json` with currently visible inbox messages and does **not** alert old mail. New messages after that trigger notifications. The alert text includes the inbox address, so shared Telegram channels can still tell which agent received the email.
 
 ## One-shot check mode
 
-Useful for cron, Kubernetes CronJob, systemd timers, or any platform that expects stdout only when something happened:
+Useful for cron, Kubernetes CronJob, systemd timers, or any platform that expects stdout only when something happened.
+
+Use the service name for the inbox you want to check:
 
 ```bash
-docker compose run --rm atomic-mail-watcher --mode check --emit-stdout
+docker compose run --rm atomic-mail-agent-a --mode check --emit-stdout
 ```
 
 Initialize state without notifying:
 
 ```bash
-docker compose run --rm atomic-mail-watcher --mode check --initialize-only --verbose
+docker compose run --rm atomic-mail-agent-a --mode check --initialize-only --verbose
 ```
 
 ## Test notification path
@@ -210,7 +176,7 @@ docker compose run --rm atomic-mail-watcher --mode check --initialize-only --ver
 This only tests your notifier credentials; it does not require Atomic Mail credentials:
 
 ```bash
-docker compose run --rm atomic-mail-watcher --mode test-notifier --send-telegram
+docker compose run --rm atomic-mail-agent-a --mode test-notifier --send-telegram
 ```
 
 ## Configuration
@@ -277,7 +243,7 @@ python -m atomicmail_watcher --mode check --emit-stdout
 
 ```bash
 docker build -t atomic-mail-watcher:local .
-docker run --rm --env-file .env -v "$PWD/data:/data" atomic-mail-watcher:local --mode check --verbose
+docker run --rm --env-file .env.agent-a -v "$PWD/data/agent-a:/data" atomic-mail-watcher:local --mode check --verbose
 ```
 
 ## Atomic Mail roadmap / future implementation ideas
@@ -298,7 +264,7 @@ References:
 
 ## Security notes
 
-- Do not commit `.env`, `data/`, `*.jwt`, or credential JSON files.
+- Do not commit `.env`, `.env.*`, `data/`, `*.jwt`, or credential JSON files.
 - The container runs as a non-root user.
 - Session/capability JWTs are stored under the data directory with restrictive file modes where the host allows it.
 - Error messages intentionally avoid printing authorization headers.
